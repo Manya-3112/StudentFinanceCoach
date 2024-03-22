@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Planner</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .container {
+            display: flex;
+        }
+
+        .left-side {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .right-side {
+            flex: 1;
+            padding: 20px;
+        }
+
+        body {
+            background-color: #1b1b1b;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #00b7ff;
+        }
+
+        label,
+        p {
+            margin: 10px 0;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #4a4a4a;
+            border-radius: 5px;
+            background-color: #2a2a2a;
+            color: #fff;
+        }
+
+        button.calc {
+            padding: 8px 20px;
+            background-color: #00ccff;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button.calc:hover {
+            background-color: #00a2ff;
+        }
+
+        .result-box {
+            background-color: #4a4a4a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="left-side">
+            <canvas id="budgetChart" width="400" height="400"></canvas>
+        </div>
+        <div class="right-side">
+            <h1>BUDGET PLANNER</h1>
+            <label for="totalMoney">Enter your monthly pocket money / salary</label>
+            <input type="text" id="totalMoney">
+            <br>
+            <button class="calc">Calculate!</button>
+            <div class="result-box">
+                <p>Clothing: ₹<span id="cloth">00000</span></p>
+                <p>Food: ₹<span id="food">00000</span></p>
+                <p>Traveling: ₹<span id="travel">00000</span></p>
+                <p>Savings/Invest : ₹<span id="save">00000</span></p>
+                <p>Misc.: ₹<span id="misc">00000</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cloth = document.querySelector("#cloth")
+        let food = document.querySelector("#food")
+        let travel = document.querySelector("#travel")
+        let save = document.querySelector("#save")
+        let misc = document.querySelector("#misc")
+
+        document.querySelector(".calc").addEventListener("click", function () {
+            let budget = parseFloat(document.querySelector("#totalMoney").value);
+            cloth.innerHTML = Math.round(budget * 0.15);
+            food.innerHTML = Math.round(budget * 0.30);
+            travel.innerHTML = Math.round(budget * 0.25);
+            save.innerHTML = Math.round(budget * 0.20);
+            misc.innerHTML = Math.round(budget * 0.10);
+
+            updatePieChart([Math.round(budget * 0.15), Math.round(budget * 0.30), Math.round(budget * 0.25), Math.round(budget * 0.20), Math.round(budget * 0.10)]);
+        });
+
+        document.getElementById('totalMoney').addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        function updatePieChart(data) {
+            var ctx = document.getElementById('budgetChart').getContext('2d');
+            var myPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Clothing', 'Food', 'Traveling', 'Savings/Invest', 'Misc.'],
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#ff6384',
+                            '#36a2eb',
+                            '#ffce56',
+                            '#4bc0c0',
+                            '#9966ff'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

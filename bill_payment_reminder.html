@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Payment Reminder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+
+        h1 {
+            color: #4d94ff;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            padding: 5px;
+            margin-right: 10px;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #4a4a4a;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #246bba;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #billReminders {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .reminder {
+            background-color: #2a2a2a;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: left;
+            border: 1px solid #4a4a4a;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Bill Payment Reminder</h1>
+    <form id="billReminderForm">
+        <input type="text" id="billName" placeholder="Bill Name" required>
+        <input type="date" id="dueDate" required>
+        <input type="number" id="billAmount" placeholder="Bill Amount" required>
+        <button type="submit">Add Reminder</button>
+    </form>
+
+    <h2>Upcoming Bill Reminders</h2>
+    <ul id="billReminders"></ul>
+    <p><strong>Total Amount: </strong><span id="totalAmount">$0.00</span></p>
+
+    <script>
+        const billReminderForm = document.getElementById('billReminderForm');
+        const billReminders = document.getElementById('billReminders');
+        const totalAmount = document.getElementById('totalAmount');
+
+        let reminderList = JSON.parse(localStorage.getItem('reminderList')) || [];
+
+        function addReminder(event) {
+            event.preventDefault();
+
+            const billName = document.getElementById('billName').value;
+            const dueDate = document.getElementById('dueDate').value;
+            const billAmount = parseFloat(document.getElementById('billAmount').value);
+
+            if (isNaN(billAmount) || billAmount <= 0) {
+                alert('Please enter a valid bill amount.');
+                return;
+            }
+
+            const reminder = {
+                name: billName,
+                dueDate: dueDate,
+                amount: billAmount
+            };
+
+            reminderList.push(reminder);
+            localStorage.setItem('reminderList', JSON.stringify(reminderList));
+            renderReminders();
+
+            document.getElementById('billName').value = '';
+            document.getElementById('dueDate').value = '';
+            document.getElementById('billAmount').value = '';
+        }
+
+        function renderReminders() {
+            billReminders.innerHTML = '';
+            let totalBillAmount = 0;
+
+            reminderList.forEach((reminder, index) => {
+                const reminderElement = document.createElement('li');
+                reminderElement.classList.add('reminder');
+                reminderElement.textContent = `${reminder.name} - Due on ${reminder.dueDate} - Amount: ${reminder.amount.toFixed(2)}`;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => deleteReminder(index));
+
+                reminderElement.appendChild(deleteButton);
+                billReminders.appendChild(reminderElement);
+
+                totalBillAmount += reminder.amount;
+            });
+
+            totalAmount.textContent = `${totalBillAmount.toFixed(2)}`;
+        }
+
+        function deleteReminder(index) {
+            reminderList.splice(index, 1);
+            localStorage.setItem('reminderList', JSON.stringify(reminderList));
+            renderReminders();
+        }
+
+        billReminderForm.addEventListener('submit', addReminder);
+
+        renderReminders();
+    </script>
+</body>
+
+</html>

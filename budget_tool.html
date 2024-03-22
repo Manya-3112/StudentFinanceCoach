@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Budgeting Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4d94ff;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 5px;
+            margin-right: 10px;
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #4a4a4a;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #4d94ff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #budgetItems {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .budget-item {
+            background-color: #2a2a2a;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #4a4a4a;
+        }
+
+        .delete-btn {
+            color: #ff6b6b;
+            cursor: pointer;
+        }
+
+        #totalBudget {
+            font-weight: bold;
+            color: #4d94ff;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Budgeting Tool</h1>
+    <form id="budgetForm">
+        <input type="text" id="itemName" placeholder="Item Name" required>
+        <input type="number" id="itemCost" placeholder="Cost" required>
+        <button type="submit">Add to Budget</button>
+    </form>
+
+    <h2>Budget Items</h2>
+    <ul id="budgetItems"></ul>
+
+    <p>Total Budget: <span id="totalBudget">$0</span></p>
+
+    <script>
+        const budgetForm = document.getElementById('budgetForm');
+        const budgetItems = document.getElementById('budgetItems');
+        const totalBudget = document.getElementById('totalBudget');
+
+        let budget = JSON.parse(localStorage.getItem('budget')) || [];
+        let totalBudgetAmount = 0;
+
+        function addBudgetItem(event) {
+            event.preventDefault();
+
+            const itemName = document.getElementById('itemName').value;
+            const itemCost = parseFloat(document.getElementById('itemCost').value);
+
+            if (isNaN(itemCost) || itemCost <= 0) {
+                alert('Please enter a valid cost.');
+                return;
+            }
+
+            const budgetItem = {
+                name: itemName,
+                cost: itemCost
+            };
+
+            budget.push(budgetItem);
+            localStorage.setItem('budget', JSON.stringify(budget));
+            renderBudgetItems();
+
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemCost').value = '';
+        }
+
+        function renderBudgetItems() {
+            budgetItems.innerHTML = '';
+            totalBudgetAmount = 0;
+
+            budget.forEach((item, index) => {
+                const listItem = document.createElement('li');
+                listItem.classList.add('budget-item');
+                listItem.textContent = `${item.name} - ${item.cost.toFixed(2)}`;
+
+                const deleteButton = document.createElement('span');
+                deleteButton.classList.add('delete-btn');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => deleteBudgetItem(index));
+
+                listItem.appendChild(deleteButton);
+                budgetItems.appendChild(listItem);
+
+                totalBudgetAmount += item.cost;
+            });
+
+            totalBudget.textContent = `${totalBudgetAmount.toFixed(2)}`;
+        }
+
+        function deleteBudgetItem(index) {
+            budget.splice(index, 1);
+            localStorage.setItem('budget', JSON.stringify(budget));
+            renderBudgetItems();
+        }
+
+        budgetForm.addEventListener('submit', addBudgetItem);
+
+        renderBudgetItems();
+    </script>
+</body>
+
+</html>
